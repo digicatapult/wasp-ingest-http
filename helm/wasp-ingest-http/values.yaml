@@ -1,0 +1,23 @@
+config:
+  port: 80
+  logLevel: info
+  kafka:
+    logLevel: nothing
+    rawPayloadTopic: raw-payloads
+  waspIngestName: http
+  ingestIdJsonPath: "$.id"
+  init:
+    registerIngest: true
+    thingServiceName: wasp-thing-service
+    thingServicePort: 80
+kafka:
+  enabled: true
+waspthingmock:
+  enabled: false
+image:
+  repository: ghcr.io/digicatapult/wasp-ingest-http
+  pullPolicy: IfNotPresent
+  tag: 'v1.0.2'
+  pullSecrets: ['ghcr-digicatapult']
+ingress:
+  path: /v1/ingest/http/message

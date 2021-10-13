@@ -1,9 +1,14 @@
 const express = require('express')
+const bodyParser = require('body-parser')
 const pinoHttp = require('pino-http')
-const { PORT } = require('./env')
+
+const { PORT, WASP_INGEST_NAME, API_MAJOR_VERSION } = require('./env')
 const logger = require('./logger')
+const parseBody = require('./parser')
+const setupForward = require('./forwarder')
 
 async function createHttpServer() {
+  const forward = await setupForward()
   const app = express()
   const requestLogger = pinoHttp({ logger })
 
@@ -14,6 +19,33 @@ async function createHttpServer() {
 
   app.get('/health', async (req, res) => {
     res.status(200).send({ status: 'ok' })
+  })
+
+  app.use(bodyParser.json({ type: 'application/json' }))
+  app.post(`/${API_MAJOR_VERSION}/ingest/${WASP_INGEST_NAME}/message`, async (req, res) => {
+    const body = req.body
+    // check we have a body that is not falsey and is an object or array
+    if (!body || typeof body !== 'object') {
+      logger.warn(`Invalid message body or headers received`)
+      res.status(400).send(`Invalid message body or headers received`)
+      return
+    }
+
+    let payload = null
+    try {
+      payload = parseBody(body)
+    } catch (err) {
+      logger.warn(`Error parsing body ${err.message || err}`)
+      res.status(400).send(`Invalid message body`)
+      return
+    }
+
+    await forward(payload)
+    // check headers haven't been sent automatically while the async next was running.
+    // assuming they haven't send a response
+    if (!res.headersSent) {
+      res.status(202).send()
+    }
   })
 
   // Sorry - app.use checks arity

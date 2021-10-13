@@ -1,0 +1,29 @@
+waspthingmock:
+  enabled: true
+  service:
+    type: ClusterIP
+  serverBlock: |-
+    upstream static_backend {
+      server localhost:8080;
+    }
+
+    server {
+      listen 0.0.0.0:8080;
+      location /v1/ingest {
+        proxy_method GET;
+
+        if ($http_content_type != "application/json") {
+            return 415;
+        }
+
+        proxy_pass http://static_backend/ingest-mock;
+      }
+      location /ingest-mock {
+        return 201 "{}";
+      }
+    }
+
+image:
+  repository: 'wasp-ingest-http'
+  tag: 'latest'
+  PullPolicy: Never

@@ -5,8 +5,9 @@ const { setupServer } = require('./helpers/server')
 
 describe('health', function () {
   const context = {}
+  setupServer(context)
+
   before(async function () {
-    await setupServer(context)
     context.response = await context.request.get('/health')
   })
 
