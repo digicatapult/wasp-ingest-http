@@ -1,9 +1,11 @@
-const envalid = require('envalid')
-const dotenv = require('dotenv')
-const jp = require('jsonpath')
+import envalid from 'envalid'
+import dotenv from 'dotenv'
+import jp from 'jsonpath'
 
 if (process.env.NODE_ENV === 'test') {
   dotenv.config({ path: 'test/test.env' })
+} else {
+  dotenv.config()
 }
 
 const vars = envalid.cleanEnv(
@@ -20,9 +22,8 @@ const vars = envalid.cleanEnv(
       const kafkaSet = new Set(input === '' ? [] : input.split(','))
       if (kafkaSet.size === 0) throw new Error('At least one kafka broker must be configured')
       return [...kafkaSet]
-    })({ default: 'localhost:9092' }),
+    })({ default: ['localhost:9092'] }),
     KAFKA_PAYLOAD_TOPIC: envalid.str({ default: 'raw-payloads' }),
-    API_MAJOR_VERSION: envalid.str({ default: 'v1' }),
     WASP_INGEST_NAME: envalid.str({ default: 'http' }),
     INGEST_ID_JSON_PATH: envalid.makeValidator((input) => {
       try {
@@ -38,4 +39,4 @@ const vars = envalid.cleanEnv(
   }
 )
 
-module.exports = vars
+export default vars

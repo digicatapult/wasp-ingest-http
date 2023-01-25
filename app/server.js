@@ -1,11 +1,13 @@
-const express = require('express')
-const bodyParser = require('body-parser')
-const pinoHttp = require('pino-http')
+import express from 'express'
+import bodyParser from 'body-parser'
+import pinoHttp from 'pino-http'
 
-const { PORT, WASP_INGEST_NAME, API_MAJOR_VERSION } = require('./env')
-const logger = require('./logger')
-const parseBody = require('./parser')
-const setupForward = require('./forwarder')
+import env from './env.js'
+import logger from './logger.js'
+import parseBody from './parser.js'
+import setupForward from './forwarder.js'
+
+const { PORT, WASP_INGEST_NAME } = env
 
 async function createHttpServer() {
   const forward = await setupForward()
@@ -22,7 +24,7 @@ async function createHttpServer() {
   })
 
   app.use(bodyParser.json({ type: 'application/json' }))
-  app.post(`/${API_MAJOR_VERSION}/ingest/${WASP_INGEST_NAME}/message`, async (req, res) => {
+  app.post(`/v1/ingest/${WASP_INGEST_NAME}/message`, async (req, res) => {
     const body = req.body
     // check we have a body that is not falsey and is an object or array
     if (!body || typeof body !== 'object') {
@@ -106,4 +108,4 @@ async function startServer() {
   }
 }
 
-module.exports = { startServer, createHttpServer }
+export { startServer, createHttpServer }

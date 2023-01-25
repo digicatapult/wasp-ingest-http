@@ -1,5 +1,4 @@
 .github
-.nyc_output
 coverage
 node_modules
 scripts
@@ -7,6 +6,6 @@ test
 
 .eslintignore
 .eslintrc
-.nycrc
+.c8rc
 .prettierrc
 *.md

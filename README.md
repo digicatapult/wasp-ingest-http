@@ -39,7 +39,6 @@ npm test
 | PORT                |    N     |        `80`        | Port on which the service will listen                                                                                             |
 | KAFKA_LOG_LEVEL     |    N     |     `nothing`      | Logging level for Kafka. Valid values are [`debug`, `info`, `warn`, `error`, `nothing`]                                           |
 | KAFKA_BROKERS       |    N     |  `localhost:9092`  | List of addresses for the Kafka brokers                                                                                           |
-| API_MAJOR_VERSION   |    N     |       `v1`         | Major API version                                                                                                                 |
 | WASP_INGEST_NAME    |    N     |       `http`       | Name of this ingest type                                                                                                          |
 | KAFKA_PAYLOAD_TOPIC |    N     |   `raw-payloads`   | Topic to publish payloads to                                                                                                      |
 | INGEST_ID_JSON_PATH |    N     |       `$.id`       | JSON Path to use when extracting the ingest specific identifier associated with the `thing` that produced the data to be ingested |

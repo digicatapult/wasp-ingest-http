@@ -1,11 +1,11 @@
-const { describe, before, after, it } = require('mocha')
-const { expect } = require('chai')
+import { describe, before, after, it } from 'mocha'
+import { expect } from 'chai'
 
-const { setupServer } = require('./helpers/server')
+import { setupServer } from './helpers/server.js'
+import createSub from './helpers/sub.js'
+import env from '../app/env.js'
 
-const createSub = require('./helpers/sub')
-
-const env = require('../app/env')
+const { WASP_INGEST_NAME, KAFKA_PAYLOAD_TOPIC } = env
 
 describe('Message Processing', function () {
   const context = {}
@@ -27,7 +27,7 @@ describe('Message Processing', function () {
     before(async function () {
       sub.resetMessages()
       context.response = await context.request
-        .post(`/${env.API_MAJOR_VERSION}/ingest/${env.WASP_INGEST_NAME}/message`)
+        .post(`/v1/ingest/${WASP_INGEST_NAME}/message`)
         .send({ id: '574bd77c-4aba-4557-aa9e-066939f938cc', answer: 42 })
 
       messages = await sub.waitForMessages({ expectedMessages: 1 })
@@ -41,7 +41,7 @@ describe('Message Processing', function () {
       expect(messages.length).to.equal(1)
 
       const message = messages[0]
-      expect(message.topic).to.equal(env.KAFKA_PAYLOAD_TOPIC)
+      expect(message.topic).to.equal(KAFKA_PAYLOAD_TOPIC)
       expect(message.key).to.equal('574bd77c-4aba-4557-aa9e-066939f938cc')
 
       const { payloadId, timestamp, ...otherMessageProps } = message.message
@@ -49,7 +49,7 @@ describe('Message Processing', function () {
       const now = new Date().getTime()
       expect(new Date(timestamp).getTime()).to.be.within(now - 1000, now + 1000)
       expect(otherMessageProps).to.deep.equal({
-        ingest: env.WASP_INGEST_NAME,
+        ingest: WASP_INGEST_NAME,
         ingestId: '574bd77c-4aba-4557-aa9e-066939f938cc',
         payload: { id: '574bd77c-4aba-4557-aa9e-066939f938cc', answer: 42 },
         metadata: {
@@ -62,9 +62,7 @@ describe('Message Processing', function () {
   describe('invalid payload (not an object)', function () {
     before(async function () {
       sub.resetMessages()
-      context.response = await context.request
-        .post(`/${env.API_MAJOR_VERSION}/ingest/${env.WASP_INGEST_NAME}/message`)
-        .send()
+      context.response = await context.request.post(`/v1/ingest/${WASP_INGEST_NAME}/message`).send()
     })
 
     it('should respond with http 400', function () {
@@ -75,9 +73,7 @@ describe('Message Processing', function () {
   describe('invalid payload (no id)', function () {
     before(async function () {
       sub.resetMessages()
-      context.response = await context.request
-        .post(`/${env.API_MAJOR_VERSION}/ingest/${env.WASP_INGEST_NAME}/message`)
-        .send({ answer: 42 })
+      context.response = await context.request.post(`/v1/ingest/${WASP_INGEST_NAME}/message`).send({ answer: 42 })
     })
 
     it('should respond with http 400', function () {
