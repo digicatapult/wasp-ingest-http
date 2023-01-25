@@ -1,19 +1,20 @@
-const { Kafka, logLevel: kafkaLogLevels } = require('kafkajs')
-require('dotenv').config()
-const delay = require('delay')
+import { Kafka, logLevel as kafkaLogLevels } from 'kafkajs'
+import delay from 'delay'
 
-const env = require('../../app/env')
+import env from '../../app/env.js'
+
+const { KAFKA_BROKERS, KAFKA_PAYLOAD_TOPIC } = env
 
 const createSub = async () => {
   const kafka = new Kafka({
     clientId: 'ingest-http-testing',
-    brokers: env.KAFKA_BROKERS,
+    brokers: KAFKA_BROKERS,
     logLevel: kafkaLogLevels.ERROR,
   })
 
   const consumer = kafka.consumer({ groupId: 'test' })
   await consumer.connect()
-  await consumer.subscribe({ topic: env.KAFKA_PAYLOAD_TOPIC, fromBeginning: true })
+  await consumer.subscribe({ topic: KAFKA_PAYLOAD_TOPIC, fromBeginning: true })
 
   const messages = []
   await consumer.run({
@@ -47,4 +48,4 @@ const createSub = async () => {
   }
 }
 
-module.exports = createSub
+export default createSub

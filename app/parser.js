@@ -1,7 +1,9 @@
-const uuid = require('uuid')
-const jp = require('jsonpath')
+import { v4 } from 'uuid'
+import jp from 'jsonpath'
 
-const { WASP_INGEST_NAME, INGEST_ID_JSON_PATH } = require('./env')
+import env from './env.js'
+
+const { WASP_INGEST_NAME, INGEST_ID_JSON_PATH } = env
 
 const parseBody = (body) => {
   let result = jp.query(body, INGEST_ID_JSON_PATH)
@@ -9,7 +11,7 @@ const parseBody = (body) => {
     throw new Error(`Could not extract ingest id using path ${INGEST_ID_JSON_PATH} from %j`, body)
   }
   const hardwareSerial = result[0] + ''
-  const payloadId = uuid.v4()
+  const payloadId = v4()
 
   return {
     ingestId: hardwareSerial,
@@ -26,4 +28,4 @@ const parseBody = (body) => {
   }
 }
 
-module.exports = parseBody
+export default parseBody

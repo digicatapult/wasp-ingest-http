@@ -1,10 +1,10 @@
-const request = require('supertest')
-const { before } = require('mocha')
+import request from 'supertest'
+import { before } from 'mocha'
 
-const { createHttpServer } = require('../../app/server')
+import { createHttpServer } from '../../app/server.js'
 
 let server = null
-const setupServer = async (context) => {
+export const setupServer = async (context) => {
   before(async function () {
     this.timeout(10000)
     if (!server) {
@@ -13,5 +13,3 @@ const setupServer = async (context) => {
     context.request = request(server.app)
   })
 }
-
-module.exports = { setupServer }
