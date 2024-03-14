@@ -1,5 +1,9 @@
 # wasp-ingest-http
 
+## Deprecation Notice
+`WASP` was deprecated on March 14th 2024, there will be no further dependency or security updates to this platform.
+---
+
 WASP Ingest that allows new thing data to be submitted via a HTTP(S) POST request. The service will listen on a path of `/ingest/{WASP_INGEST_NAME}/messages` and accept POST requests with a JSON body. A JSON path is then configured to determine how to get the ingest specific identifier for the thing that created the message from the JSON body.
 
 ## Getting started
